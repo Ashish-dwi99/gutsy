@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=77.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chotu-line"
+version = "0.1.0"
+description = "Text your own AI agent from your phone. It books, buys, fills forms, and reminds you, from your own computer. Free with Claude Code or Codex."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Sankhya AI Labs" }]
+keywords = ["ai-agent", "personal-assistant", "telegram", "claude-code", "codex", "mcp", "browser-automation"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Topic :: Communications :: Chat",
+]
+dependencies = [
+  "httpx>=0.27.0",
+  "keyring>=25.0.0",
+  "websockets>=12.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0"]
+
+[project.urls]
+Homepage = "https://github.com/Ashish-dwi99/chotu-line"
+Issues = "https://github.com/Ashish-dwi99/chotu-line/issues"
+Chotu = "https://www.sankhyaailabs.com"
+
+[project.scripts]
+chotu-line = "chotu_line.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["chotu_line*"]
+
+[tool.setuptools.package-data]
+chotu_line = ["instructions/*.md", "browser_fill.js"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

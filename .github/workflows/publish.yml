@@ -1,0 +1,20 @@
+name: publish
+
+# Publishes to PyPI when a GitHub release is published. Uses PyPI trusted
+# publishing: add this repository as a trusted publisher for the `chotu-line`
+# project on pypi.org once, and no token is ever stored.
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv build
+      - uses: pypa/gh-action-pypi-publish@release/v1
