@@ -124,6 +124,8 @@ def cmd_run(args: argparse.Namespace) -> None:
         format="%(asctime)s %(levelname)s %(message)s",
         handlers=[logging.StreamHandler(), logging.FileHandler(config.home / "line.log")],
     )
+    # httpx logs every request URL at INFO, and Telegram's URLs carry the bot token.
+    logging.getLogger("httpx").setLevel(logging.WARNING)
     write_workspace_instructions(config)
     if config.browser:
         browser.launch(config.chrome_port, config.chrome_profile)
@@ -151,6 +153,8 @@ def cmd_status(args: argparse.Namespace) -> None:
     available = detect_brains(config)
     print(f"brain:     {config.brain} ({'ready' if available[config.brain] else 'NOT available'})")
     print(f"telegram:  {'paired' if config.paired else 'not paired'}")
+    if not config.paired and config.telegram_token and config.pairing_code:
+        print(f"           pair by opening https://t.me/{asyncio.run(_bot_username(config.telegram_token))}?start={config.pairing_code}")
     print(f"timezone:  {config.timezone or 'unset'}")
     print(f"browser:   {'running' if browser.is_running(config.chrome_port) else 'stopped'} (port {config.chrome_port})")
     print(f"vault:     {len(store.vault_items())} items")

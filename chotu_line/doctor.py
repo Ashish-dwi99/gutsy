@@ -46,7 +46,7 @@ def checks(config: LineConfig) -> list[Check]:
         ),
     ]
     results.append(_telegram_check(config))
-    results.append(Check(config.paired, "paired with your Telegram", "run `chotu-line run` and open the pairing link it prints"))
+    results.append(Check(config.paired, "paired with your Telegram", "open the pairing link that `chotu-line status` shows, on your phone"))
     results.append(
         Check(
             not config.browser or browser.find_chrome() is not None,

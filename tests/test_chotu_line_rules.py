@@ -148,3 +148,15 @@ def test_launchd_service_restarts_and_finds_the_brain_clis(tmp_path: Path, monke
     plistlib.dumps(plist)  # serializable as written to ~/Library/LaunchAgents
     unit = service.systemd_unit(LineConfig())
     assert "Restart=always" in unit and "chotu_line.cli run" in unit
+
+
+def test_run_never_logs_request_urls_that_carry_the_bot_token(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import logging
+
+    from chotu_line import cli
+
+    monkeypatch.setenv("CHOTU_LINE_HOME", str(tmp_path))
+    LineConfig(telegram_token="123:secret", browser=False).save()
+    monkeypatch.setattr(cli.asyncio, "run", lambda coro: coro.close())
+    cli.cmd_run(None)
+    assert logging.getLogger("httpx").getEffectiveLevel() >= logging.WARNING
