@@ -1,4 +1,6 @@
-# Chotu Line
+# Gutsy
+
+**Give your Claude some guts.**
 
 ### Instinct-ize your Claude Code or Codex. No new subscription.
 
@@ -15,7 +17,7 @@ reminds you, using your own browser and your own logins.
   not the AI's judgement.
 - **Open source.** Apache-2.0. Read it, fork it, run it.
 
-|  | Hosted assistants (Instinct and similar) | Chotu Line |
+|  | Hosted assistants (Instinct and similar) | Gutsy |
 |---|---|---|
 | Cost | A separate service to join (Instinct is invite-only today) | $0 on top of Claude Code or Codex |
 | Where the agent works | Their cloud, with access to your accounts | Your computer, your own browser |
@@ -43,25 +45,25 @@ one brain: [Claude Code](https://claude.com/claude-code) signed in, or
 [Codex](https://github.com/openai/codex) signed in.
 
 ```bash
-uv tool install git+https://github.com/Ashish-dwi99/chotu-line
-# or: pipx install git+https://github.com/Ashish-dwi99/chotu-line
+uv tool install git+https://github.com/Ashish-dwi99/gutsy
+# or: pipx install git+https://github.com/Ashish-dwi99/gutsy
 
-chotu-line setup              # pick the brain, paste a Telegram bot token
-chotu-line service install    # runs in the background and starts at login
+gutsy setup              # pick the brain, paste a Telegram bot token
+gutsy service install    # runs in the background and starts at login
 ```
 
 `setup` prints a link. Open it on your phone to pair: only your Telegram
-account can talk to your line.
+account can talk to your Gutsy.
 
 **Getting a Telegram bot token:** in Telegram, open
 [@BotFather](https://t.me/BotFather), send `/newbot`, pick a name, and copy
 the token it gives you.
 
-**Let it use your accounts:** run `chotu-line browser` and sign in to the
+**Let it use your accounts:** run `gutsy browser` and sign in to the
 sites you want it to use (Amazon, Swiggy, BookMyShow…) in the Chrome window
 that opens. Those sessions persist.
 
-Something not working? `chotu-line doctor` checks everything and tells you
+Something not working? `gutsy doctor` checks everything and tells you
 the fix.
 
 ## What it does
@@ -77,7 +79,7 @@ the fix.
 - **Reminders and monitors**, for example "check the price every morning".
   A monitor with nothing new stays quiet.
 - **Saved logins** live in your OS keychain
-  (`chotu-line vault add --label GitHub --origin https://github.com`). The
+  (`gutsy vault add --label GitHub --origin https://github.com`). The
   agent fills them in without ever seeing the password, and only on that
   exact site.
 
@@ -110,18 +112,18 @@ merchant's site, after you approve. See [SECURITY.md](SECURITY.md).
 
 ## Privacy
 
-Everything the line learns about you stays on your computer, in
-`~/.chotu-line`, and saved passwords stay in your OS keychain. Telegram chats
+Everything Gutsy learns about you stays on your computer, in
+`~/.gutsy`, and saved passwords stay in your OS keychain. Telegram chats
 with bots are **not end-to-end encrypted**, so Telegram can read your
 messages; never send passwords or card numbers there. `/forget` erases what
-the line knows about you.
+Gutsy knows about you.
 
 ## Limits
 
 - Your computer must be awake.
 - Card fields inside a payment provider's frame aren't filled. You pay, or
   the site uses your saved card.
-- Some sites block automated browsers. The line uses a real Chrome window,
+- Some sites block automated browsers. Gutsy uses a real Chrome window,
   which gets through most of them; Google Search sometimes still shows a
   CAPTCHA.
 - Windows isn't supported yet.
@@ -130,7 +132,7 @@ the line knows about you.
 
 We ran 30 real [WebVoyager](https://github.com/MinorJerry/WebVoyager)
 errands (Amazon, Booking, Google Flights, GitHub, Apple…) through Claude
-Sonnet with a real Chrome, the setup this line uses. It completed 26 of 30,
+Sonnet with a real Chrome, the setup Gutsy uses. It completed 26 of 30,
 with a median of 38 seconds per task. Each run was judged with WebVoyager's
 own prompt, using Claude as the judge. With only 30 tasks, treat this as a
 rough guide, not a leaderboard score.

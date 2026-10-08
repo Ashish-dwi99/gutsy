@@ -17,7 +17,7 @@ from typing import Any
 
 import keyring
 
-KEYCHAIN_SERVICE = "chotu-line-vault"
+KEYCHAIN_SERVICE = "gutsy-vault"
 LOGIN_FIELDS = ("username", "password")
 
 
@@ -32,7 +32,7 @@ def put_secret(handle: str, secret: dict[str, str]) -> None:
 def get_secret(handle: str) -> dict[str, Any]:
     raw = keyring.get_password(KEYCHAIN_SERVICE, handle)
     if raw is None:
-        raise VaultError(f"the keychain has no secret for {handle}; add it again with `chotu-line vault add`")
+        raise VaultError(f"the keychain has no secret for {handle}; add it again with `gutsy vault add`")
     return json.loads(raw)
 
 

@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Callable, Protocol
 
 from .. import browser
-from ..config import LineConfig
+from ..config import GutsyConfig
 
 STDERR_TAIL_CHARS = 2_000
 PLAYWRIGHT_MCP_PACKAGE = "@playwright/mcp@latest"
@@ -37,22 +37,22 @@ class Brain(Protocol):
     async def run(self, request: TurnRequest) -> TurnResult: ...
 
 
-def line_mcp_server(config: LineConfig, token: str) -> dict[str, Any]:
-    """How a brain starts the line's MCP server (stdio)."""
+def gutsy_mcp_server(config: GutsyConfig, token: str) -> dict[str, Any]:
+    """How a brain starts Gutsy's MCP server (stdio)."""
     package_root = str(Path(__file__).resolve().parents[2])
     return {
         "command": sys.executable,
-        "args": ["-m", "chotu_line.mcp_server"],
+        "args": ["-m", "gutsy.mcp_server"],
         "env": {
-            "CHOTU_LINE_TOKEN": token,
-            "CHOTU_LINE_HOME": str(config.home),
+            "GUTSY_TOKEN": token,
+            "GUTSY_HOME": str(config.home),
             "PYTHONPATH": package_root,
         },
     }
 
 
-def playwright_mcp_server(config: LineConfig) -> dict[str, Any] | None:
-    """Playwright MCP attached to the line's Chrome, when the owner has Node."""
+def playwright_mcp_server(config: GutsyConfig) -> dict[str, Any] | None:
+    """Playwright MCP attached to Gutsy's Chrome, when the owner has Node."""
     npx = shutil.which("npx")
     if not config.browser or npx is None:
         return None
@@ -62,8 +62,8 @@ def playwright_mcp_server(config: LineConfig) -> dict[str, Any] | None:
     }
 
 
-def mcp_servers(config: LineConfig, token: str) -> dict[str, dict[str, Any]]:
-    servers = {"chotu_line": line_mcp_server(config, token)}
+def mcp_servers(config: GutsyConfig, token: str) -> dict[str, dict[str, Any]]:
+    servers = {"gutsy": gutsy_mcp_server(config, token)}
     playwright = playwright_mcp_server(config)
     if playwright is not None:
         servers["playwright"] = playwright

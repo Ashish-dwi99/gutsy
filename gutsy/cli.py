@@ -1,4 +1,4 @@
-"""`chotu-line`: set up, run, and manage the line."""
+"""`gutsy`: set up, run, and manage Gutsy."""
 
 from __future__ import annotations
 
@@ -13,14 +13,14 @@ import sys
 from pathlib import Path
 
 from . import browser, context, doctor, service
-from .brains.base import line_mcp_server
+from .brains.base import gutsy_mcp_server
 from .brains.chotu import ChotuBrain
 from .brains.claude import ClaudeBrain
 from .brains.codex import CodexBrain
-from .config import BRAINS, CHOTU_HUB_DATA_DIR, DEFAULT_BRAIN, LineConfig, ensure_home
+from .config import BRAINS, CHOTU_HUB_DATA_DIR, DEFAULT_BRAIN, GutsyConfig, ensure_home
 from .control import ASK_TIMEOUT_SECONDS
-from .daemon import PRIVACY, Line, poll_telegram, serve_control, tick_schedules
-from .store import LineStore
+from .daemon import PRIVACY, Gutsy, poll_telegram, serve_control, tick_schedules
+from .store import GutsyStore
 from .telegram import TelegramBot, TelegramError
 from .vault import delete_secret, normalize_origin, put_secret
 
@@ -36,7 +36,7 @@ def system_timezone() -> str:
     return "UTC"
 
 
-def detect_brains(config: LineConfig) -> dict[str, bool]:
+def detect_brains(config: GutsyConfig) -> dict[str, bool]:
     return {
         "chotu": ChotuBrain(config).available(),
         "claude": ClaudeBrain.available(),
@@ -44,13 +44,13 @@ def detect_brains(config: LineConfig) -> dict[str, bool]:
     }
 
 
-def register_with_chotu(config: LineConfig, hub_data_dir: Path) -> Path:
-    """Mount the line's tools in Chotu, carrying the standing token."""
+def register_with_chotu(config: GutsyConfig, hub_data_dir: Path) -> Path:
+    """Mount Gutsy's tools in Chotu, carrying the standing token."""
     path = hub_data_dir / "mcp_servers.json"
     existing = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     servers = existing.setdefault("mcpServers", {})
-    servers["chotu_line"] = {
-        **line_mcp_server(config, config.chotu_token),
+    servers["gutsy"] = {
+        **gutsy_mcp_server(config, config.chotu_token),
         "timeout": ASK_TIMEOUT_SECONDS + 60,
         "risk": "low",
         "tools": {"exclude": CHOTU_MCP_EXCLUDED_TOOLS},
@@ -60,13 +60,13 @@ def register_with_chotu(config: LineConfig, hub_data_dir: Path) -> Path:
     return path
 
 
-def write_workspace_instructions(config: LineConfig) -> None:
+def write_workspace_instructions(config: GutsyConfig) -> None:
     """Codex reads AGENTS.md from its working root; Claude gets the same text as a system prompt."""
     (config.workspace / "AGENTS.md").write_text(context.instructions("assistant"), encoding="utf-8")
 
 
 def cmd_setup(args: argparse.Namespace) -> None:
-    config = LineConfig.load()
+    config = GutsyConfig.load()
     available = detect_brains(config)
     print("Brains on this machine:")
     for name in BRAINS:
@@ -88,7 +88,7 @@ def cmd_setup(args: argparse.Namespace) -> None:
         config.pairing_code = secrets.token_hex(4)
     config.save()
     write_workspace_instructions(config)
-    LineStore(config.db_path)
+    GutsyStore(config.db_path)
 
     if CHOTU_HUB_DATA_DIR.exists():
         print(f"\nChotu found; its tools are registered in {register_with_chotu(config, CHOTU_HUB_DATA_DIR)}")
@@ -100,9 +100,9 @@ def cmd_setup(args: argparse.Namespace) -> None:
         print("\nAlready paired with your Telegram account.")
     else:
         print("\nNext:")
-        print("  chotu-line service install   # keeps the line running in the background")
+        print("  gutsy service install   # keeps Gutsy running in the background")
         print(f"  then open this on your phone to pair: https://t.me/{bot_name}?start={config.pairing_code}")
-    print("\nCheck everything any time with `chotu-line doctor`.")
+    print("\nCheck everything any time with `gutsy doctor`.")
 
 
 async def _bot_username(token: str) -> str:
@@ -116,13 +116,13 @@ async def _bot_username(token: str) -> str:
 
 
 def cmd_run(args: argparse.Namespace) -> None:
-    config = LineConfig.load()
+    config = GutsyConfig.load()
     if not config.telegram_token:
-        sys.exit("run `chotu-line setup` first")
+        sys.exit("run `gutsy setup` first")
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(message)s",
-        handlers=[logging.StreamHandler(), logging.FileHandler(config.home / "line.log")],
+        handlers=[logging.StreamHandler(), logging.FileHandler(config.home / "gutsy.log")],
     )
     # httpx logs every request URL at INFO, and Telegram's URLs carry the bot token.
     logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -132,24 +132,24 @@ def cmd_run(args: argparse.Namespace) -> None:
     asyncio.run(_serve(config))
 
 
-async def _serve(config: LineConfig) -> None:
-    store = LineStore(config.db_path)
+async def _serve(config: GutsyConfig) -> None:
+    store = GutsyStore(config.db_path)
     bot = TelegramBot(config.telegram_token)
-    line = Line(config, store, bot)
-    server = await serve_control(line, config.socket_path)
-    logging.getLogger("chotu_line").info("line is up with brain %s", config.brain)
+    gutsy = Gutsy(config, store, bot)
+    server = await serve_control(gutsy, config.socket_path)
+    logging.getLogger("gutsy").info("gutsy is up with brain %s", config.brain)
     if not config.paired:
         print(f"waiting to pair: https://t.me/{(await bot.me())['username']}?start={config.pairing_code}")
     try:
         async with server:
-            await asyncio.gather(poll_telegram(line, bot, store), tick_schedules(line))
+            await asyncio.gather(poll_telegram(gutsy, bot, store), tick_schedules(gutsy))
     finally:
         await bot.close()
 
 
 def cmd_status(args: argparse.Namespace) -> None:
-    config = LineConfig.load()
-    store = LineStore(config.db_path)
+    config = GutsyConfig.load()
+    store = GutsyStore(config.db_path)
     available = detect_brains(config)
     print(f"brain:     {config.brain} ({'ready' if available[config.brain] else 'NOT available'})")
     print(f"telegram:  {'paired' if config.paired else 'not paired'}")
@@ -162,21 +162,21 @@ def cmd_status(args: argparse.Namespace) -> None:
 
 
 def cmd_brain(args: argparse.Namespace) -> None:
-    config = LineConfig.load()
+    config = GutsyConfig.load()
     config.brain = args.name
     config.save()
     print(f"brain set to {args.name}")
 
 
 def cmd_browser(args: argparse.Namespace) -> None:
-    config = LineConfig.load()
+    config = GutsyConfig.load()
     browser.launch(config.chrome_port, config.chrome_profile)
-    print("The line's Chrome is open. Sign in to the sites you want it to use; the sessions persist.")
+    print("Gutsy's Chrome is open. Sign in to the sites you want it to use; the sessions persist.")
 
 
 def cmd_vault_add(args: argparse.Namespace) -> None:
-    config = LineConfig.load()
-    store = LineStore(config.db_path)
+    config = GutsyConfig.load()
+    store = GutsyStore(config.db_path)
     origins = [normalize_origin(origin) for origin in args.origin]
     username = input("Username / email / phone: ").strip()
     secret = {"username": username, "password": getpass.getpass("Password: ")}
@@ -193,12 +193,12 @@ def _mask(value: str) -> str:
 
 
 def cmd_vault_list(args: argparse.Namespace) -> None:
-    for item in LineStore(LineConfig.load().db_path).vault_items():
+    for item in GutsyStore(GutsyConfig.load().db_path).vault_items():
         print(f"{item['handle']}  {item['kind']:5}  {item['label']}  {item['hint']}  {', '.join(item['origins'])}")
 
 
 def cmd_vault_rm(args: argparse.Namespace) -> None:
-    store = LineStore(LineConfig.load().db_path)
+    store = GutsyStore(GutsyConfig.load().db_path)
     if not store.remove_vault_item(args.handle):
         sys.exit(f"no vault item {args.handle}")
     delete_secret(args.handle)
@@ -206,17 +206,17 @@ def cmd_vault_rm(args: argparse.Namespace) -> None:
 
 
 def cmd_doctor(args: argparse.Namespace) -> None:
-    text, healthy = doctor.render(doctor.checks(LineConfig.load()))
+    text, healthy = doctor.render(doctor.checks(GutsyConfig.load()))
     print(text)
     if not healthy:
         sys.exit(1)
 
 
 def cmd_service(args: argparse.Namespace) -> None:
-    config = LineConfig.load()
+    config = GutsyConfig.load()
     if args.action == "install":
         if not config.telegram_token:
-            sys.exit("run `chotu-line setup` first")
+            sys.exit("run `gutsy setup` first")
         print(f"installed {service.install(config)}; logs in {config.home / 'service.log'}")
     elif args.action == "uninstall":
         service.uninstall()
@@ -226,17 +226,17 @@ def cmd_service(args: argparse.Namespace) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="chotu-line", description="Text your own agent from your phone.")
+    parser = argparse.ArgumentParser(prog="gutsy", description="Text your own agent from your phone.")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("setup", help="choose a brain and connect Telegram").set_defaults(run=cmd_setup)
-    sub.add_parser("run", help="run the line").set_defaults(run=cmd_run)
-    sub.add_parser("status", help="show the line's state").set_defaults(run=cmd_status)
+    sub.add_parser("run", help="run Gutsy").set_defaults(run=cmd_run)
+    sub.add_parser("status", help="show Gutsy's state").set_defaults(run=cmd_status)
     brain = sub.add_parser("brain", help="switch the brain")
     brain.add_argument("name", choices=BRAINS)
     brain.set_defaults(run=cmd_brain)
-    sub.add_parser("browser", help="open the line's Chrome to sign in to sites").set_defaults(run=cmd_browser)
+    sub.add_parser("browser", help="open Gutsy's Chrome to sign in to sites").set_defaults(run=cmd_browser)
     sub.add_parser("doctor", help="check the setup and say how to fix problems").set_defaults(run=cmd_doctor)
-    svc = sub.add_parser("service", help="run the line in the background, starting at login")
+    svc = sub.add_parser("service", help="run Gutsy in the background, starting at login")
     svc.add_argument("action", choices=["install", "uninstall", "status"])
     svc.set_defaults(run=cmd_service)
 

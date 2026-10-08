@@ -31,7 +31,7 @@ def call(socket_path: Path, request: dict[str, Any], *, timeout: float) -> dict[
         try:
             conn.connect(str(socket_path))
         except OSError as exc:
-            raise ControlError("the chotu-line daemon is not running") from exc
+            raise ControlError("the gutsy daemon is not running") from exc
         conn.sendall(json.dumps(request).encode("utf-8") + b"\n")
         buffer = b""
         while not buffer.endswith(b"\n"):

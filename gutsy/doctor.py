@@ -1,4 +1,4 @@
-"""`chotu-line doctor`: every setup check, each with the fix in plain words."""
+"""`gutsy doctor`: every setup check, each with the fix in plain words."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import keyring
 
 from . import browser, service
 from .brains.chotu import ChotuBrain
-from .config import LineConfig, config_path
+from .config import GutsyConfig, config_path
 from .telegram import TelegramBot, TelegramError
 
 BRAIN_INSTALL = {
@@ -29,24 +29,24 @@ class Check:
     required: bool = True
 
 
-def brain_available(name: str, config: LineConfig) -> bool:
+def brain_available(name: str, config: GutsyConfig) -> bool:
     if name == "chotu":
         return ChotuBrain(config).available()
     return shutil.which(name) is not None
 
 
-def checks(config: LineConfig) -> list[Check]:
+def checks(config: GutsyConfig) -> list[Check]:
     results = [
         Check(sys.version_info >= (3, 11), f"Python {sys.version.split()[0]}", "install Python 3.11 or newer"),
-        Check(config_path().exists(), "setup has run", "run `chotu-line setup`"),
+        Check(config_path().exists(), "setup has run", "run `gutsy setup`"),
         Check(
             brain_available(config.brain, config),
             f"brain: {config.brain}",
-            BRAIN_INSTALL[config.brain] + ", or switch with `chotu-line brain <name>`",
+            BRAIN_INSTALL[config.brain] + ", or switch with `gutsy brain <name>`",
         ),
     ]
     results.append(_telegram_check(config))
-    results.append(Check(config.paired, "paired with your Telegram", "open the pairing link that `chotu-line status` shows, on your phone"))
+    results.append(Check(config.paired, "paired with your Telegram", "open the pairing link that `gutsy status` shows, on your phone"))
     results.append(
         Check(
             not config.browser or browser.find_chrome() is not None,
@@ -62,14 +62,14 @@ def checks(config: LineConfig) -> list[Check]:
         )
     )
     results.append(_keychain_check())
-    results.append(Check(service.is_installed(), "background service installed", "run `chotu-line service install`", required=False))
-    results.append(Check(service.is_running(), "background service running", "run `chotu-line service install`, then check service.log", required=False))
+    results.append(Check(service.is_installed(), "background service installed", "run `gutsy service install`", required=False))
+    results.append(Check(service.is_running(), "background service running", "run `gutsy service install`, then check service.log", required=False))
     return results
 
 
-def _telegram_check(config: LineConfig) -> Check:
+def _telegram_check(config: GutsyConfig) -> Check:
     if not config.telegram_token:
-        return Check(False, "Telegram bot token", "run `chotu-line setup` and paste the token from @BotFather")
+        return Check(False, "Telegram bot token", "run `gutsy setup` and paste the token from @BotFather")
 
     async def username() -> str:
         bot = TelegramBot(config.telegram_token)
@@ -81,7 +81,7 @@ def _telegram_check(config: LineConfig) -> Check:
     try:
         return Check(True, f"Telegram bot @{asyncio.run(username())}")
     except TelegramError as exc:
-        return Check(False, "Telegram bot token", f"Telegram rejected it ({exc}); run `chotu-line setup` again")
+        return Check(False, "Telegram bot token", f"Telegram rejected it ({exc}); run `gutsy setup` again")
 
 
 def _keychain_check() -> Check:

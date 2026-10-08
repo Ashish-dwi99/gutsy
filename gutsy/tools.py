@@ -8,10 +8,10 @@ from functools import wraps
 from typing import Any, Callable
 
 from . import browser, permissions, schedule
-from .config import LineConfig
+from .config import GutsyConfig
 from .control import APPROVAL_TIMEOUT_SECONDS, ASK_TIMEOUT_SECONDS, ControlError, call
 from .mcp_stdio import Tool, ToolFailure
-from .store import PERSONAL_FIELDS, WORKSTREAM_STATUSES, LineStore, StoreError
+from .store import PERSONAL_FIELDS, WORKSTREAM_STATUSES, GutsyStore, StoreError
 from .vault import VaultError, normalize_origin
 
 _DOMAIN_ERRORS = (StoreError, schedule.RuleError, VaultError, ControlError)
@@ -21,7 +21,7 @@ WORKSTREAM_FIELDS = ("objective", "constraints", "decisions", "progress", "next_
 def _tool(name: str, description: str, properties: dict[str, Any], required: tuple[str, ...] = ()):
     def register(handler: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(handler)
-        def run(self: "LineTools", arguments: dict[str, Any]) -> Any:
+        def run(self: "GutsyTools", arguments: dict[str, Any]) -> Any:
             try:
                 return handler(self, arguments)
             except _DOMAIN_ERRORS as exc:
@@ -36,10 +36,10 @@ def _tool(name: str, description: str, properties: dict[str, Any], required: tup
 _STRING = {"type": "string"}
 
 
-class LineTools:
+class GutsyTools:
     """Tool handlers bound to one owner's store, config, and turn token."""
 
-    def __init__(self, config: LineConfig, store: LineStore, token: str) -> None:
+    def __init__(self, config: GutsyConfig, store: GutsyStore, token: str) -> None:
         self.config = config
         self.store = store
         self.token = token
@@ -141,7 +141,7 @@ class LineTools:
             return json.dumps({"behavior": "deny", "message": "The owner declined this from their phone."})
         return json.dumps({"behavior": "allow", "updatedInput": tool_input})
 
-    # what the line knows about the owner ----------------------------------
+    # what Gutsy knows about the owner ----------------------------------
     @_tool(
         "recall",
         "Read everything saved about the owner: personal info, memories, and open workstreams.",
@@ -290,7 +290,7 @@ class LineTools:
     def vault_fill(self, arguments: dict[str, Any]) -> dict[str, Any]:
         item = self.store.vault_item(str(arguments["handle"]))
         if not browser.is_running(self.config.chrome_port):
-            raise ToolFailure("the line's Chrome is not running; start it with `chotu-line browser`")
+            raise ToolFailure("Gutsy's Chrome is not running; start it with `gutsy browser`")
         return browser.fill(self.config.chrome_port, item)
 
     @_tool(
@@ -303,7 +303,7 @@ class LineTools:
     def vault_request_setup(self, arguments: dict[str, Any]) -> str:
         origin = normalize_origin(str(arguments["origin"]))
         label = str(arguments["label"]).replace('"', "")
-        command = f'chotu-line vault add --label "{label}" --origin {origin}'
+        command = f'gutsy vault add --label "{label}" --origin {origin}'
         text = f"I need your {label} login saved first. On your Mac, run:\n{command}\nthen tell me when it's done."
         self._control({"op": "send", "text": text}, timeout=60)
         return "setup instructions sent; wait for the owner to say it is saved"

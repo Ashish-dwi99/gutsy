@@ -1,6 +1,6 @@
 """The owner's dedicated Chrome, and secret fill into it.
 
-The line uses its own Chrome profile with a DevTools port so that:
+Gutsy uses its own Chrome profile with a DevTools port so that:
 - the brain's browser tools (Playwright MCP attached with --cdp-endpoint)
   drive real, logged-in sessions that persist between tasks;
 - `fill` can type a saved login into the same tab over CDP, so the secret
@@ -59,7 +59,7 @@ def is_running(port: int) -> bool:
 
 
 def launch(port: int, profile: Path) -> None:
-    """Start the line's Chrome if it is not already listening."""
+    """Start Gutsy's Chrome if it is not already listening."""
     if is_running(port):
         return
     chrome = find_chrome()
@@ -166,7 +166,7 @@ def fill(port: int, item: dict[str, Any]) -> dict[str, Any]:
         allowed = ", ".join(item["origins"])
         raise VaultError(f"no open tab is on {allowed}; open the sign-in page there first")
     secret = {"kind": item["kind"], **get_secret(item["handle"])}
-    script = resources.files("chotu_line").joinpath("browser_fill.js").read_text(encoding="utf-8")
+    script = resources.files("gutsy").joinpath("browser_fill.js").read_text(encoding="utf-8")
     expected_origin = origin_of(target["url"])
     expression = f"({script.strip()})({json.dumps(secret)}, {json.dumps(expected_origin)})"
     reply = _evaluate(target, expression)

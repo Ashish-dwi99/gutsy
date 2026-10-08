@@ -14,12 +14,12 @@ CHOTU_HUB_URL = "http://127.0.0.1:7777"
 CHOTU_HUB_DATA_DIR = Path.home() / "Library" / "Application Support" / "Chotu" / "hub"
 
 
-def line_home() -> Path:
-    return Path(os.getenv("CHOTU_LINE_HOME", Path.home() / ".chotu-line")).expanduser()
+def gutsy_home() -> Path:
+    return Path(os.getenv("GUTSY_HOME", Path.home() / ".gutsy")).expanduser()
 
 
 @dataclass
-class LineConfig:
+class GutsyConfig:
     """The owner's settings, one JSON file readable only by the owner.
 
     The Telegram token is the only credential here; vault secrets live in the
@@ -41,7 +41,7 @@ class LineConfig:
 
     @property
     def home(self) -> Path:
-        return line_home()
+        return gutsy_home()
 
     @property
     def workspace(self) -> Path:
@@ -49,7 +49,7 @@ class LineConfig:
 
     @property
     def db_path(self) -> Path:
-        return self.home / "line.db"
+        return self.home / "gutsy.db"
 
     @property
     def socket_path(self) -> Path:
@@ -68,7 +68,7 @@ class LineConfig:
             raise ValueError(f"brain must be one of {', '.join(BRAINS)}, not {self.brain!r}")
 
     @classmethod
-    def load(cls) -> "LineConfig":
+    def load(cls) -> "GutsyConfig":
         path = config_path()
         if not path.exists():
             return cls()
@@ -89,11 +89,11 @@ class LineConfig:
 
 
 def config_path() -> Path:
-    return line_home() / "config.json"
+    return gutsy_home() / "config.json"
 
 
 def ensure_home() -> Path:
-    home = line_home()
+    home = gutsy_home()
     home.mkdir(parents=True, exist_ok=True)
     home.chmod(0o700)
     (home / "workspace").mkdir(exist_ok=True)

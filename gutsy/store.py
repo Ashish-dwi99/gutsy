@@ -56,8 +56,8 @@ def _id(prefix: str) -> str:
     return f"{prefix}_{uuid.uuid4().hex[:10]}"
 
 
-class LineStore:
-    """Everything the line remembers, in one SQLite file.
+class GutsyStore:
+    """Everything Gutsy remembers, in one SQLite file.
 
     The daemon and the MCP server (a child of the brain) open the same file;
     WAL mode lets both read while one writes.
@@ -281,7 +281,7 @@ class LineStore:
 
     # forgetting -----------------------------------------------------------
     def forget_everything(self) -> None:
-        """Erase what the line knows about the owner. The vault and schedules stay; they are managed separately."""
+        """Erase what Gutsy knows about the owner. The vault and schedules stay; they are managed separately."""
         with self._connect() as db:
             for table in ("personal_info", "memories", "workstreams", "sessions", "grants", "trusted_tools"):
                 db.execute(f"DELETE FROM {table}")

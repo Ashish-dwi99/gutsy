@@ -1,7 +1,7 @@
 """Chotu as the brain: one turn through the local Chotu hub.
 
 Chotu runs its own agent (kimi-agent-rs) with its own browser, memory, and
-approvals. It reaches the line's tools through the MCP server `chotu-line
+approvals. It reaches Gutsy's tools through the MCP server `gutsy
 setup` registers in the hub's mcp_servers.json, which carries Chotu's
 standing token instead of a per-turn one.
 """
@@ -12,7 +12,7 @@ from typing import Any
 
 import httpx
 
-from ..config import LineConfig
+from ..config import GutsyConfig
 from .base import TurnRequest, TurnResult
 
 TURN_TIMEOUT_SECONDS = 15 * 60
@@ -23,7 +23,7 @@ def turn_payload(request: TurnRequest) -> dict[str, Any]:
         "transcript": request.prompt,
         "source": "text",
         "session_id": request.session_id or f"line_{request.chat_id}",
-        "client_request_id": f"line:{request.token}"[:120],
+        "client_request_id": f"gutsy:{request.token}"[:120],
         "persist_conversation": True,
         "remember_context": True,
         "response_mode": "text_text",
@@ -44,7 +44,7 @@ def answer_text(response: dict[str, Any]) -> str:
 class ChotuBrain:
     name = "chotu"
 
-    def __init__(self, config: LineConfig) -> None:
+    def __init__(self, config: GutsyConfig) -> None:
         self.config = config
 
     def available(self) -> bool:

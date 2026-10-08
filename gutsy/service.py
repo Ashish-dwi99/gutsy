@@ -1,7 +1,7 @@
-"""Run the line as a login service so it survives closed terminals and reboots.
+"""Run Gutsy as a login service so it survives closed terminals and reboots.
 
 macOS uses a launchd agent and Linux a systemd user unit. Both restart the
-line if it exits. Services start with a minimal PATH, so install captures the
+Gutsy if it exits. Services start with a minimal PATH, so install captures the
 directories of the CLIs the brains need (claude, codex, node/npx) as they are
 found right now.
 """
@@ -15,11 +15,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-from .config import LineConfig
+from .config import GutsyConfig
 
-LABEL = "ai.chotu.line"
-SYSTEMD_UNIT = "chotu-line.service"
-TOOLS_ON_PATH = ("claude", "codex", "node", "npx", "chotu-line")
+LABEL = "ai.gutsy"
+SYSTEMD_UNIT = "gutsy.service"
+TOOLS_ON_PATH = ("claude", "codex", "node", "npx", "gutsy")
 BASE_PATH = ("/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin", "/usr/sbin", "/sbin")
 
 
@@ -37,14 +37,14 @@ def service_path() -> str:
 
 
 def command() -> list[str]:
-    return [sys.executable, "-m", "chotu_line.cli", "run"]
+    return [sys.executable, "-m", "gutsy.cli", "run"]
 
 
-def launchd_plist(config: LineConfig) -> dict:
+def launchd_plist(config: GutsyConfig) -> dict:
     return {
         "Label": LABEL,
         "ProgramArguments": command(),
-        "EnvironmentVariables": {"PATH": service_path(), "CHOTU_LINE_HOME": str(config.home), "HOME": str(Path.home())},
+        "EnvironmentVariables": {"PATH": service_path(), "GUTSY_HOME": str(config.home), "HOME": str(Path.home())},
         "RunAtLoad": True,
         "KeepAlive": True,
         "ThrottleInterval": 30,
@@ -54,12 +54,12 @@ def launchd_plist(config: LineConfig) -> dict:
     }
 
 
-def systemd_unit(config: LineConfig) -> str:
+def systemd_unit(config: GutsyConfig) -> str:
     argv = " ".join(command())
     return (
-        "[Unit]\nDescription=Chotu Line\nAfter=network-online.target\n\n"
+        "[Unit]\nDescription=Gutsy\nAfter=network-online.target\n\n"
         f"[Service]\nExecStart={argv}\nRestart=always\nRestartSec=30\n"
-        f"Environment=PATH={service_path()}\nEnvironment=CHOTU_LINE_HOME={config.home}\n\n"
+        f"Environment=PATH={service_path()}\nEnvironment=GUTSY_HOME={config.home}\n\n"
         "[Install]\nWantedBy=default.target\n"
     )
 
@@ -79,7 +79,7 @@ def _run(argv: list[str], *, check: bool = True) -> subprocess.CompletedProcess[
     return result
 
 
-def install(config: LineConfig) -> Path:
+def install(config: GutsyConfig) -> Path:
     if sys.platform == "darwin":
         path = _launchd_file()
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -95,7 +95,7 @@ def install(config: LineConfig) -> Path:
         _run(["systemctl", "--user", "daemon-reload"])
         _run(["systemctl", "--user", "enable", "--now", SYSTEMD_UNIT])
         return path
-    raise ServiceError("background service install supports macOS and Linux; run `chotu-line run` instead")
+    raise ServiceError("background service install supports macOS and Linux; run `gutsy run` instead")
 
 
 def uninstall() -> None:

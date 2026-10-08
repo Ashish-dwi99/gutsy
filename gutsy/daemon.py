@@ -1,4 +1,4 @@
-"""The line's daemon: Telegram in, a brain's turn, Telegram out.
+"""Gutsy's daemon: Telegram in, a brain's turn, Telegram out.
 
 One turn runs per chat at a time; messages that arrive meanwhile wait and go
 together as the next turn. A question or approval the brain is waiting on is
@@ -21,12 +21,12 @@ import httpx
 
 from . import browser, context, schedule
 from .brains import TurnRequest, TurnResult, make_brain
-from .config import BRAINS, LineConfig
+from .config import BRAINS, GutsyConfig
 from .control import APPROVAL_TIMEOUT_SECONDS, ASK_TIMEOUT_SECONDS
-from .store import LineStore
+from .store import GutsyStore
 from .telegram import Inbound, TelegramBot, TelegramError, parse_update
 
-log = logging.getLogger("chotu_line")
+log = logging.getLogger("gutsy")
 
 TYPING_INTERVAL_SECONDS = 4.5
 SCHEDULER_TICK_SECONDS = 30
@@ -78,8 +78,8 @@ class ChatState:
         return self.task is not None and not self.task.done()
 
 
-class Line:
-    def __init__(self, config: LineConfig, store: LineStore, channel: Channel) -> None:
+class Gutsy:
+    def __init__(self, config: GutsyConfig, store: GutsyStore, channel: Channel) -> None:
         self.config = config
         self.store = store
         self.channel = channel
@@ -177,7 +177,7 @@ class Line:
             await self.channel.send(
                 chat_id,
                 "done: your saved details, memories, workstreams, and conversation history are erased. "
-                "saved logins and schedules stay; manage them with chotu-line on your computer.",
+                "saved logins and schedules stay; manage them with gutsy on your computer.",
             )
         elif command == "/status":
             await self.channel.send(chat_id, self._status_text(state))
@@ -334,13 +334,13 @@ def _log_failure(task: asyncio.Task[Any]) -> None:
         log.error("turn failed", exc_info=task.exception())
 
 
-async def serve_control(line: Line, socket_path: Path) -> asyncio.AbstractServer:
+async def serve_control(gutsy: Gutsy, socket_path: Path) -> asyncio.AbstractServer:
     socket_path.unlink(missing_ok=True)
 
     async def on_connect(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
         try:
             request = json.loads(await reader.readline())
-            reply = await line.control(request)
+            reply = await gutsy.control(request)
         except (json.JSONDecodeError, KeyError) as exc:
             reply = {"ok": False, "error": f"bad control request: {exc}"}
         writer.write(json.dumps(reply).encode("utf-8") + b"\n")
@@ -352,7 +352,7 @@ async def serve_control(line: Line, socket_path: Path) -> asyncio.AbstractServer
     return server
 
 
-async def poll_telegram(line: Line, bot: TelegramBot, store: LineStore) -> None:
+async def poll_telegram(gutsy: Gutsy, bot: TelegramBot, store: GutsyStore) -> None:
     offset = int(store.get_kv("telegram_offset", "0") or 0)
     while True:
         try:
@@ -368,12 +368,12 @@ async def poll_telegram(line: Line, bot: TelegramBot, store: LineStore) -> None:
             if inbound is None:
                 continue
             try:
-                await line.handle(inbound)
+                await gutsy.handle(inbound)
             except (TelegramError, httpx.HTTPError) as exc:
                 log.warning("could not answer update %s: %s", update["update_id"], exc)
 
 
-async def tick_schedules(line: Line) -> None:
+async def tick_schedules(gutsy: Gutsy) -> None:
     while True:
-        await line.run_due_schedules(time.time())
+        await gutsy.run_due_schedules(time.time())
         await asyncio.sleep(SCHEDULER_TICK_SECONDS)

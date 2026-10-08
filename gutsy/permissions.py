@@ -1,8 +1,8 @@
 """Which of the brain's own tool calls need the owner's tap.
 
-Claude Code hands every permission prompt to the line's `approve` tool. Most
+Claude Code hands every permission prompt to Gutsy's `approve` tool. Most
 calls are safe to allow without bothering the owner on their phone: reading,
-searching, the line's own tools, browsing, and writing inside the line's
+searching, Gutsy's own tools, browsing, and writing inside Gutsy's
 workspace. Three kinds of call are gated in code, not by instructions:
 
 - browser tools that run arbitrary page code, upload local files, or read raw
@@ -33,7 +33,7 @@ READ_ONLY_TOOLS = frozenset(
         "NotebookRead",
     }
 )
-LINE_PREFIX = "mcp__chotu_line__"
+GUTSY_PREFIX = "mcp__gutsy__"
 BROWSER_PREFIX = "mcp__playwright__"
 # Run page code, push local files to a site, or show raw requests (a submitted password lives there).
 BROWSER_ALWAYS_ASK = frozenset(
@@ -79,7 +79,7 @@ def judge(
     purchase_approved: Callable[[], bool] = lambda: False,
 ) -> Verdict:
     """`payment_page` and `purchase_approved` are only called for browser interactions."""
-    if tool_name in READ_ONLY_TOOLS or tool_name.startswith(LINE_PREFIX):
+    if tool_name in READ_ONLY_TOOLS or tool_name.startswith(GUTSY_PREFIX):
         return Verdict("allow")
     if tool_name in BROWSER_ALWAYS_ASK:
         return Verdict("ask", reason="this browser tool can read page secrets or send local files")

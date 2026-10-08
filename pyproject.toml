@@ -3,8 +3,8 @@ requires = ["setuptools>=77.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "chotu-line"
-version = "0.1.2"
+name = "gutsy"
+version = "0.2.0"
 description = "Instinct-ize your Claude Code or Codex: text it on Telegram and it runs errands on your own computer. No new subscription."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -31,19 +31,19 @@ dependencies = [
 dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0"]
 
 [project.urls]
-Homepage = "https://github.com/Ashish-dwi99/chotu-line"
-Issues = "https://github.com/Ashish-dwi99/chotu-line/issues"
+Homepage = "https://github.com/Ashish-dwi99/gutsy"
+Issues = "https://github.com/Ashish-dwi99/gutsy/issues"
 Chotu = "https://www.sankhyaailabs.com"
 
 [project.scripts]
-chotu-line = "chotu_line.cli:main"
+gutsy = "gutsy.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["chotu_line*"]
+include = ["gutsy*"]
 
 [tool.setuptools.package-data]
-chotu_line = ["instructions/*.md", "browser_fill.js"]
+gutsy = ["instructions/*.md", "browser_fill.js"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

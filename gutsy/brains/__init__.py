@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from ..config import LineConfig
+from ..config import GutsyConfig
 from .base import Brain, TurnRequest, TurnResult
 from .chotu import ChotuBrain
 from .claude import ClaudeBrain
 from .codex import CodexBrain
 
 
-def make_brain(name: str, config: LineConfig, instructions: str) -> Brain:
+def make_brain(name: str, config: GutsyConfig, instructions: str) -> Brain:
     if name == "claude":
         return ClaudeBrain(config, instructions)
     if name == "codex":

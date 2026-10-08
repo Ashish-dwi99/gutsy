@@ -82,7 +82,7 @@ def split_message(text: str, limit: int = MESSAGE_LIMIT) -> list[str]:
 class TelegramBot:
     def __init__(self, token: str, *, client: httpx.AsyncClient | None = None) -> None:
         if not token:
-            raise TelegramError("no Telegram bot token; run `chotu-line setup`")
+            raise TelegramError("no Telegram bot token; run `gutsy setup`")
         self._base = f"{API}/bot{token}"
         self._client = client or httpx.AsyncClient(timeout=POLL_SECONDS + 15)
 

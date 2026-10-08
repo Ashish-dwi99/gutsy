@@ -1,7 +1,7 @@
 name: publish
 
 # Publishes to PyPI when a GitHub release is published. Uses PyPI trusted
-# publishing: add this repository as a trusted publisher for the `chotu-line`
+# publishing: add this repository as a trusted publisher for the `gutsy`
 # project on pypi.org once (workflow publish.yml, environment pypi), then set
 # the repository variable PYPI_PUBLISH=true. No token is ever stored.
 on:

@@ -1,6 +1,6 @@
 """Claude Code as the brain, on the owner's own subscription.
 
-`claude -p` streams JSON events. Its tool-permission prompts go to the line's
+`claude -p` streams JSON events. Its tool-permission prompts go to Gutsy's
 `approve` MCP tool, which asks the owner on Telegram when a call is not safe
 to allow outright.
 """
@@ -12,14 +12,14 @@ import shutil
 from pathlib import Path
 from typing import Any
 
-from ..config import LineConfig
+from ..config import GutsyConfig
 from .base import TurnRequest, TurnResult, mcp_servers, run_jsonl
 
-PERMISSION_TOOL = "mcp__chotu_line__approve"
+PERMISSION_TOOL = "mcp__gutsy__approve"
 
 
 def build_argv(
-    claude: str, config: LineConfig, request: TurnRequest, *, mcp_config: Path, instructions: str
+    claude: str, config: GutsyConfig, request: TurnRequest, *, mcp_config: Path, instructions: str
 ) -> list[str]:
     argv = [
         claude,
@@ -33,7 +33,7 @@ def build_argv(
         "--permission-prompt-tool",
         PERMISSION_TOOL,
         # Pinned: the owner's own Claude Code default (acceptEdits, bypassPermissions)
-        # must never decide for the line, or the phone gate would be skipped.
+        # must never decide for Gutsy, or the phone gate would be skipped.
         "--permission-mode",
         "default",
         "--append-system-prompt",
@@ -72,7 +72,7 @@ class StreamReader:
 class ClaudeBrain:
     name = "claude"
 
-    def __init__(self, config: LineConfig, instructions: str) -> None:
+    def __init__(self, config: GutsyConfig, instructions: str) -> None:
         self.config = config
         self.instructions = instructions
 

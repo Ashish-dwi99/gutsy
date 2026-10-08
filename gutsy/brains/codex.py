@@ -1,8 +1,8 @@
 """Codex as the brain, on the owner's own ChatGPT login.
 
-`codex exec --json` prints thread/turn/item events. Codex reads the line's
+`codex exec --json` prints thread/turn/item events. Codex reads Gutsy's
 instructions from AGENTS.md in the workspace (the daemon writes it), runs
-shell commands in its workspace-write sandbox, and reaches the line's tools
+shell commands in its workspace-write sandbox, and reaches Gutsy's tools
 over MCP. Exec mode never pauses for approval, so consequential actions rely
 on `request_approval`, as the instructions require.
 """
@@ -13,7 +13,7 @@ import json
 import shutil
 from typing import Any
 
-from ..config import LineConfig
+from ..config import GutsyConfig
 from .base import TurnRequest, TurnResult, mcp_servers, run_jsonl
 
 
@@ -24,7 +24,7 @@ def _toml(value: Any) -> str:
     return json.dumps(value)
 
 
-def build_argv(codex: str, config: LineConfig, request: TurnRequest) -> list[str]:
+def build_argv(codex: str, config: GutsyConfig, request: TurnRequest) -> list[str]:
     argv = [
         codex,
         "exec",
@@ -88,7 +88,7 @@ class EventReader:
 class CodexBrain:
     name = "codex"
 
-    def __init__(self, config: LineConfig) -> None:
+    def __init__(self, config: GutsyConfig) -> None:
         self.config = config
 
     @staticmethod

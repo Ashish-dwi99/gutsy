@@ -1,4 +1,4 @@
-"""Chotu Line: text your own agent from your phone.
+"""Gutsy: text your own agent from your phone.
 
 One local daemon carries Telegram messages to a brain (Chotu, Claude Code, or
 Codex) and gives that brain one personal-assistant toolset over MCP: messages

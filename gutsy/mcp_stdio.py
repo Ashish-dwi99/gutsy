@@ -1,6 +1,6 @@
 """A minimal MCP server over stdio: initialize, tools/list, tools/call.
 
-Hand-written instead of the MCP SDK so the line installs with no heavy
+Hand-written instead of the MCP SDK so Gutsy installs with no heavy
 dependency and does not break when the SDK reshapes its API (2.x renamed
 FastMCP). The wire format is JSON-RPC 2.0, one message per line.
 """
