@@ -1,12 +1,30 @@
 # Chotu Line
 
-**Text your own AI agent from your phone.** It finds, compares, books,
-cancels, fills forms, and reminds you. It does the work on your own computer,
-in your own browser, with your own logins.
+### Instinct-ize your Claude Code or Codex. No new subscription.
 
-It's free if you already pay for **Claude Code** or **Codex**: the line uses
-your existing subscription. You need no API key and no server, and it has no
-monthly fee of its own.
+Text the AI agent you already pay for on Telegram, and it runs your errands
+on your own computer. It books, buys, cancels, fills forms, follows up and
+reminds you, using your own browser and your own logins.
+
+- **No new subscription.** It uses the Claude Code or Codex plan you already
+  have. There's no API key, no server, and no monthly fee.
+- **Your computer, your data.** It works in your own logged-in Chrome. What it
+  learns about you stays on your machine.
+- **It asks before it spends.** Purchases, bookings and messages to anyone
+  else need a tap on your phone. On payment pages the software enforces this,
+  not the AI's judgement.
+- **Open source.** Apache-2.0. Read it, fork it, run it.
+
+|  | Hosted assistants (Instinct and similar) | Chotu Line |
+|---|---|---|
+| Cost | A separate service to join (Instinct is invite-only today) | $0 on top of Claude Code or Codex |
+| Where the agent works | Their cloud, with access to your accounts | Your computer, your own browser |
+| Your data | On their servers | On your computer; passwords in your OS keychain |
+| Approvals | Their policy | Your phone; payment pages gated in code |
+| Code | Closed | Open source |
+
+<sub>Not affiliated with Instinct or Spear Street Technology. "Instinct" is used
+only to describe the kind of product this is.</sub>
 
 An example conversation:
 

@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "chotu-line"
 version = "0.1.2"
-description = "Text your own AI agent from your phone. It books, buys, fills forms, and reminds you, from your own computer. Free with Claude Code or Codex."
+description = "Instinct-ize your Claude Code or Codex: text it on Telegram and it runs errands on your own computer. No new subscription."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Sankhya AI Labs" }]
-keywords = ["ai-agent", "personal-assistant", "telegram", "claude-code", "codex", "mcp", "browser-automation"]
+keywords = ["instinct-alternative", "ai-agent", "personal-assistant", "telegram", "claude-code", "codex", "mcp", "browser-automation"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Environment :: Console",
