@@ -245,3 +245,10 @@ async def test_pairing_message_discloses_that_telegram_can_read_chats(home: Path
     gutsy, channel = make_gutsy(home, paired=False)
     await gutsy.handle(text("/start abcd", user="7"))
     assert "not end-to-end encrypted" in channel.texts()[-1]
+
+
+def test_every_command_in_the_menu_is_handled() -> None:
+    from gutsy.daemon import COMMANDS, HELP
+
+    for name, _ in COMMANDS:
+        assert f"/{name}" in HELP

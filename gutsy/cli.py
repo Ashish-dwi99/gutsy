@@ -19,7 +19,7 @@ from .brains.claude import ClaudeBrain
 from .brains.codex import CodexBrain
 from .config import BRAINS, CHOTU_HUB_DATA_DIR, DEFAULT_BRAIN, GutsyConfig, ensure_home
 from .control import ASK_TIMEOUT_SECONDS
-from .daemon import PRIVACY, Gutsy, poll_telegram, serve_control, tick_schedules
+from .daemon import COMMANDS, PRIVACY, Gutsy, poll_telegram, serve_control, tick_schedules
 from .store import GutsyStore
 from .telegram import TelegramBot, TelegramError
 from .vault import delete_secret, normalize_origin, put_secret
@@ -137,6 +137,7 @@ async def _serve(config: GutsyConfig) -> None:
     bot = TelegramBot(config.telegram_token)
     gutsy = Gutsy(config, store, bot)
     server = await serve_control(gutsy, config.socket_path)
+    await bot.set_commands(COMMANDS)
     logging.getLogger("gutsy").info("gutsy is up with brain %s", config.brain)
     if not config.paired:
         print(f"waiting to pair: https://t.me/{(await bot.me())['username']}?start={config.pairing_code}")

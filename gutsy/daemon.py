@@ -40,6 +40,13 @@ HELP = (
     "/status shows what's running\n"
     "/forget erases what I know about you"
 )
+COMMANDS = [
+    ("stop", "stop the current task"),
+    ("new", "start a fresh conversation"),
+    ("brain", "show or switch the brain"),
+    ("status", "what's running"),
+    ("forget", "erase what I know about you"),
+]
 PRIVACY = (
     "Privacy: I run on your own computer, and what I learn about you stays there. "
     "Telegram chats with bots are not end-to-end encrypted, so Telegram can read them. "

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gutsy"
-version = "0.2.0"
+version = "0.2.1"
 description = "Instinct-ize your Claude Code or Codex: text it on Telegram and it runs errands on your own computer. No new subscription."
 readme = "README.md"
 requires-python = ">=3.11"

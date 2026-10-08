@@ -119,6 +119,10 @@ class TelegramBot:
             message_id = str(result["message_id"])
         return message_id
 
+    async def set_commands(self, commands: list[tuple[str, str]]) -> None:
+        """The menu Telegram shows when the owner types `/`."""
+        await self._call("setMyCommands", {"commands": [{"command": name, "description": text} for name, text in commands]})
+
     async def typing(self, chat_id: str) -> None:
         await self._call("sendChatAction", {"chat_id": chat_id, "action": "typing"})
 
