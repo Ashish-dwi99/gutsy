@@ -28,6 +28,7 @@ def test_claude_resumes_and_routes_permission_prompts_to_the_line(tmp_path: Path
     argv = claude_brain.build_argv("claude", LineConfig(), request, mcp_config=tmp_path / "m.json", instructions="be kind")
     assert argv[:3] == ["claude", "-p", "book it"]
     assert argv[argv.index("--permission-prompt-tool") + 1] == "mcp__chotu_line__approve"
+    assert argv[argv.index("--permission-mode") + 1] == "default"
     assert argv[argv.index("--resume") + 1] == "sess-1"
     assert argv[argv.index("--append-system-prompt") + 1] == "be kind"
 

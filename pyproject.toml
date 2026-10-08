@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chotu-line"
-version = "0.1.1"
+version = "0.1.2"
 description = "Text your own AI agent from your phone. It books, buys, fills forms, and reminds you, from your own computer. Free with Claude Code or Codex."
 readme = "README.md"
 requires-python = ">=3.11"

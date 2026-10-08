@@ -32,6 +32,10 @@ def build_argv(
         str(mcp_config),
         "--permission-prompt-tool",
         PERMISSION_TOOL,
+        # Pinned: the owner's own Claude Code default (acceptEdits, bypassPermissions)
+        # must never decide for the line, or the phone gate would be skipped.
+        "--permission-mode",
+        "default",
         "--append-system-prompt",
         instructions,
     ]
