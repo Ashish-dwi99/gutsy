@@ -1,6 +1,7 @@
 # Gutsy
 
 **Give your Claude some guts.**
+[![M8ven Score](https://m8ven.ai/badge/mcp/ashish-dwi99-gutsy-1dszgk)](https://m8ven.ai/mcp/ashish-dwi99-gutsy-1dszgk?s=readme)
 
 ### Instinct-ize your Claude Code or Codex. No new subscription.
 
@@ -141,4 +142,4 @@ rough guide, not a leaderboard score.
 
 Apache-2.0. Made by Sankhya AI Labs, the team behind
 [Chotu](https://www.sankhyaailabs.com).
-[![M8ven Score](https://m8ven.ai/badge/mcp/ashish-dwi99-gutsy-1dszgk)](https://m8ven.ai/mcp/ashish-dwi99-gutsy-1dszgk?s=readme)
+
